@@ -1,140 +1,98 @@
-def Encrypt(text, key_1, key_2, key_3, alphabet): 
-
-    i = 0
-    result = ''
-
-    for char in text:
-        position = alphabet.index(char)
-
-        change = ((key_1+1337)**19 + (key_3+i*33)**13 + (key_3+333)**15 + (key_2+17+i)**17) + i
-        position = (position + change) % (len(alphabet)-1)
-
-        result = result + alphabet[position]
-
-        key_1 = key_1 + key_3 + 11
-        key_2 = (key_2*5) + key_1 + (key_3*3) + 311
-        key_3 = key_3 * (3**i)
-        i = i + 1
-
-
-
-    return result
-
-
-
-
-    
-
-def Decrypt(text, key_1, key_2, key_3, alphabet): 
-
-    i = 0
-    result = ''
-
-    for char in text:
-        position = alphabet.index(char)
-        
-        change = ((key_1+1337)**19 + (key_3+i*33)**13 + (key_3+333)**15 + (key_2+17+i)**17) + i
-        position = (position - change) % (len(alphabet)-1)
-        
-        result = result + alphabet[position]
-
-        key_1 = key_1 + key_3 + 11
-        key_2 = (key_2*5) + key_1 + (key_3*3) + 311
-        key_3 = key_3 * (3**i)
-        i = i + 1
-
-
-    return result
-
-def pass_through_cipher(choice, text, key_1, key_2, key_3, iterations):
+def apply_cipher(choice, text, key_1, key_2, key_3, iterations):
     alphabet = ['=','x','~','$','+','l','m','B','o','p','"','w',',','y','.','/','0','d','2','9',':',';','@','A','b','I','J','K','<',' ',')','*',
                 'k','O','P','n','C','3','4','5','6','7','8','h','i','j','t',']','^','_','`','a','H','#','!','-','z','D','E','Q','R','X','Y','Z',
                 '[','(','F','G','f','g','U','|','N','1','e','S','T','{','V','W','u','v','>','?','L','M','c','&','\'','\\','}','q','r','s','%']
 
 
-    if choice == 'e':
-        text = Encrypt(text=text, key_1=key_1, key_2=key_2, key_3=key_3, alphabet=alphabet)
-    elif choice == 'd':
-        text = Decrypt(text=text, key_1=key_1, key_2=key_2, key_3=key_3, alphabet=alphabet)
+    
+    for index in range(0, iterations):
+        i = 0
+        result = ''
+        for char in text:
+            if alphabet.count(char) == 0:
+                print(f"Message contains an illegal character '{char}'")
+                break
+            position = alphabet.index(char)
+        
+            change = ((key_1+1337)**10 + (key_3+i*33)**11 + (key_3+333)**7 + (key_2+17+i)**11) + i
+           
+            if choice == 'e':
+                position = (position + change) % (len(alphabet)-1)
+            elif choice == 'd':
+                position = (position - change) % (len(alphabet)-1)
+            else: 
+                return False
+
+            result = result + alphabet[position]
+
+            key_1 = key_1 + key_3 + 11
+            key_2 = (key_2*5) + key_1 + (key_3*3) + 311
+            key_3 = key_3 * (3**i) + 2
+            i = i + 1
+
+        text = result
+
         
     return text
 
-def check_password(text): #TODO
-    if text == '123':
-        return 1
-    elif text == 'admin':
-        return 2
-    else:
-        return 0
 
+def get_key(index):
+
+    while True:
+
+        if index == 0:
+            key = input("First Key:  ")
+        elif index == 1:
+            key = input("Second Key: ")
+        elif index == 2:
+            key = input("Third Key:  ")
+        else: 
+            return False
+
+        if is_valid_key(key):
+            return int(key)
+        
 
 def is_valid_key(key): #TODO
-    return True 
+
+    if key == '':
+        print("Key cannot be empty")
+        return False
+    elif len(key) > 8:
+        print("Key too long")
+        return False 
+    else:
+        return True
 
 
-#TODO add exit condition
+print("************************************")
+print("license")
+print("************************************")
+
+key = []
+
+for i in range(0,3):
+    key.append(get_key(i))
 
 print("------------------------------------")
-
-#password = input("Enter password: ")
-
-#permission = check_password(password)
-
-while True:
-    key_input = int(input("First Key:  "))
-
-    if is_valid_key(key_input):
-        key_1 = key_input
-        break
-
-while True:
-    key_input = int(input("Second Key: "))
-
-    if is_valid_key(key_input):
-        key_2 = key_input
-        break
-
-while True:
-    key_input = int(input("Third Key:  "))
-
-    if is_valid_key(key_input):
-        key_3 = key_input
-        break
-
-
-print("-------------------------")
 print('Enter "exit" to quit.')
 
 while True:
 
-#TODO make this other way round, so first ask for message then option
-
-
     option = input("Encrypt or Decrypt ? Enter [e/d]: ").lower()
     
-    if option == 'e':
-        message = input("Enter a message to encrypt: ")
+    if option == 'e' or option == 'd':
+        message = input("Enter a message: ")
 
-        #encryption happens here
-        message = pass_through_cipher(option, message, key_1, key_2, key_3, 1)
+        print("Working...\n")
+        message = apply_cipher(choice=option, text=message, key_1=key[0], key_2=key[1], key_3=key[2], iterations=5)
 
-
-        print(f"Encrypted message: \"{message}\"")
-        print("------------------------------------\n")
-
-    elif option == 'd':
-        message = input("Enter a message to decrypt: ")
-
-        #decryption happens here
-        message = pass_through_cipher(option, message, key_1, key_2, key_3, 1)
-
-
-        print(f"Decrypted message: \"{message}\"")
+        print(f"Processed message: \"{message}\"")
         print("------------------------------------\n")
 
     elif option == "exit":
         exit()
 
     else:
-        print("Please enter 'e' or 'd': ")
+        print("Please enter 'e' or 'd'.")
     
