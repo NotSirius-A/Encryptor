@@ -11,7 +11,7 @@ Given alphabet is always specifed on top of the script and can be modifed freely
 
 ## Notes
 - Script performs encryption "iterations" (code variable) times, default is 5 (more can be slow).<br>
-- Program can be easily quit of out by typing 'exit'.
+- Program can be easily stopped by typing 'exit'.
 
 
 
